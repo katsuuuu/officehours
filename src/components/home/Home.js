@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import * as mysql from "mysql";
 import {
   FormControl,
   Grid,
@@ -15,12 +14,12 @@ import {
   Typography,
 } from "@material-ui/core";
 
-import { getAllStudents } from "../../database/sqlQueries";
+import {
+  getAllCoursesByStudent,
+  getAllStudents,
+} from "../../database/sqlQueries";
 
 const Home = () => {
-  // TODO: set up a .env file with the info required
-  //const db = mysql.createConnection(process.env.DB_HOST);
-
   const [selectedStudentName, setSelectedStudentName] = useState("");
   const [allStudentNames, setAllStudentNames] = useState([]);
   const [courseData, setCourseData] = useState([]);
@@ -29,14 +28,23 @@ const Home = () => {
     setSelectedStudentName(event.target.value);
   };
 
-  // useEffect(() => {
-  // // TODO: implement this then uncomment
-  //   setAllStudentNames(getAllStudents(db));
-  // }, [db]);
+  useEffect(() => {
+    const resolvePromise = async () => {
+      setAllStudentNames(await getAllStudents());
+    };
 
-  // useEffect(() => {
-  //   // Use procedure to query this
-  // }, [db, selectedStudentName]);
+    resolvePromise();
+  }, []);
+
+  useEffect(() => {
+    const resolvePromise = async () => {
+      setCourseData(await getAllCoursesByStudent(selectedStudentName));
+    };
+
+    resolvePromise();
+  }, [selectedStudentName]);
+
+  console.log(allStudentNames);
 
   return (
     <Grid
@@ -60,13 +68,13 @@ const Home = () => {
             value={selectedStudentName}
             onChange={handleChange}
             inputProps={{
-              name: "age",
+              name: "Name",
               id: "filled-age-native-simple",
             }}
           >
             <option aria-label="None" value="" />
             {allStudentNames.map((student) => {
-              return <option value={student}>{student}</option>;
+              return <option value={student.name}>{student.name}</option>;
             })}
           </Select>
         </FormControl>
@@ -77,19 +85,40 @@ const Home = () => {
           <Table aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>Most Left Column</TableCell>
-                <TableCell align="right">More Columns</TableCell>
+                <TableCell>Course Number</TableCell>
+                <TableCell align="right">TA Name</TableCell>
+                <TableCell align="right">Day of Week</TableCell>
+                <TableCell align="right">Start Time</TableCell>
+                <TableCell align="right">End Time</TableCell>
+                <TableCell align="right">Room Info</TableCell>
+                <TableCell align="right">Meeting Link</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
-              {courseData.map((row) => (
-                <TableRow key={row.name}>
-                  {/* <TableCell component="th" scope="row">
-                {row.NAME2}
-                </TableCell>
-                <TableCell align="right">{row.NAME}</TableCell> */}
-                </TableRow>
-              ))}
+              {courseData.map((row) => {
+                const {
+                  course_num,
+                  TA_Name,
+                  day,
+                  start_time,
+                  end_time,
+                  room_information,
+                  Link,
+                } = row;
+                return (
+                  <TableRow key={`${room_information}${Link}`}>
+                    <TableCell component="th" scope="row">
+                      {course_num}
+                    </TableCell>
+                    <TableCell align="right">{TA_Name}</TableCell>
+                    <TableCell align="right">{day}</TableCell>
+                    <TableCell align="right">{start_time}</TableCell>
+                    <TableCell align="right">{end_time}</TableCell>
+                    <TableCell align="right">{room_information}</TableCell>
+                    <TableCell align="right">{Link}</TableCell>
+                  </TableRow>
+                );
+              })}
             </TableBody>
           </Table>
         </TableContainer>
