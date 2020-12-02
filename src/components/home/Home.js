@@ -44,8 +44,6 @@ const Home = () => {
     resolvePromise();
   }, [selectedStudentName]);
 
-  console.log(allStudentNames);
-
   return (
     <Grid
       container
@@ -56,7 +54,7 @@ const Home = () => {
     >
       <Grid item xs={12}>
         <Typography component="h1" variant="h1">
-          Office hours
+          Office Hours
         </Typography>
       </Grid>
 
@@ -95,7 +93,13 @@ const Home = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {courseData.map((row) => {
+              {courseData.map((row, index) => {
+                Object.entries(row).forEach(([key, value]) => {
+                  if (key == "course_num" && value == null) {
+                    row["course_num"] = "Not Enrolled in any courses.";
+                  }
+                });
+
                 const {
                   course_num,
                   TA_Name,
@@ -105,8 +109,9 @@ const Home = () => {
                   room_information,
                   Link,
                 } = row;
+
                 return (
-                  <TableRow key={`${room_information}${Link}`}>
+                  <TableRow key={index}>
                     <TableCell component="th" scope="row">
                       {course_num}
                     </TableCell>
