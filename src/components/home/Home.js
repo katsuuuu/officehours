@@ -95,8 +95,8 @@ const Home = () => {
             <TableBody>
               {courseData.map((row, index) => {
                 Object.entries(row).forEach(([key, value]) => {
-                  if (key == "course_num" && value == null) {
-                    row["course_num"] = "Not Enrolled in any courses.";
+                  if (key === "course_num" && value == null) {
+                    row["course_num"] = "Not enrolled in any courses.";
                   }
                 });
 
